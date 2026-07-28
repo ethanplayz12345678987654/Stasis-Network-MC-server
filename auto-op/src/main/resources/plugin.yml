@@ -1,0 +1,6 @@
+name: AutoOp
+main: com.ethanplayz.autoop.AutoOp
+version: 1.0.0
+api-version: 1.21
+authors:
+  - ethanplayz12345678987654

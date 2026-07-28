@@ -1,0 +1,4 @@
+# Default config for AutoOp plugin
+# Place this file at auto-op/src/main/resources/config.yml or edit after building at deploy/backend/plugins/AutoOp/config.yml
+
+target: EthanPLAYZ
