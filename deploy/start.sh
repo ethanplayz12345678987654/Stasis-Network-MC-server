@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Helper script to fetch Velocity, EaglerXServer, and optional backend plugins
-# (EssentialsX, Vault, LuckPerms, WorldEdit, WorldGuard) and start the docker-compose stack.
+# (EssentialsX, Vault, LuckPerms, WorldEdit, WorldGuard, DiscordSRV) and start the docker-compose stack.
 # Behavior:
 # - By default, fetches the latest release for PaperMC/Velocity, lax1dude/eaglerxserver, EssentialsX/Essentials,
-#   MilkBowl/Vault, lucko/LuckPerms, EngineHub/WorldEdit, EngineHub/WorldGuard via the GitHub releases API where available.
+#   MilkBowl/Vault, lucko/LuckPerms, EngineHub/WorldEdit, EngineHub/WorldGuard, and DiscordSRV/DiscordSRV via the GitHub releases API where available.
 # - You can pin to a tag by setting VELOCITY_TAG, EAGLER_TAG, ESSENTIALS_TAG, VAULT_TAG, LUCKPERMS_TAG,
-#   WORLDEDIT_TAG, and/or WORLDGUARD_TAG environment variables.
+#   WORLDEDIT_TAG, WORLDGUARD_TAG, and/or DISCORDSRV_TAG environment variables.
 # - You can bypass the API and provide direct URLs by setting VELOCITY_URL, EAGLER_URL, ESSENTIALS_URL, VAULT_URL,
-#   LUCKPERMS_URL, WORLDEDIT_URL, and/or WORLDGUARD_URL environment variables.
+#   LUCKPERMS_URL, WORLDEDIT_URL, WORLDGUARD_URL, and/or DISCORDSRV_URL environment variables.
 # - If GITHUB_TOKEN is set in the environment, it will be used to increase GitHub API rate limits.
 
 set -euo pipefail
@@ -28,6 +28,7 @@ VAULT_REPO="MilkBowl/Vault"
 LUCK_REPO="lucko/LuckPerms"
 WE_REPO="EngineHub/WorldEdit"
 WG_REPO="EngineHub/WorldGuard"
+DISCORD_REPO="DiscordSRV/DiscordSRV"
 
 # Utility: call GitHub API, optionally using token
 github_api_get() {
@@ -97,6 +98,7 @@ RESOLVED_VAULT_URL=$(resolve_release_asset "$VAULT_REPO" "${VAULT_TAG:-}" ".*Vau
 RESOLVED_LUCK_URL=$(resolve_release_asset "$LUCK_REPO" "${LUCKPERMS_TAG:-}" ".*luckperms.*\\.jar$" ".*\\.jar$" LUCKPERMS_URL) || true
 RESOLVED_WE_URL=$(resolve_release_asset "$WE_REPO" "${WORLDEDIT_TAG:-}" ".*worldedit.*\\.jar$" ".*\\.jar$" WORLDEDIT_URL) || true
 RESOLVED_WG_URL=$(resolve_release_asset "$WG_REPO" "${WORLDGUARD_TAG:-}" ".*worldguard.*\\.jar$" ".*\\.jar$" WORLDGUARD_URL) || true
+RESOLVED_DISCORD_URL=$(resolve_release_asset "$DISCORD_REPO" "${DISCORDSRV_TAG:-}" ".*discordsrv.*\\.jar$" ".*\\.jar$" DISCORDSRV_URL) || true
 
 if [ -z "${RESOLVED_VELOCITY_URL:-}" ] || [ -z "${RESOLVED_EAGLER_URL:-}" ]; then
   echo "ERROR: Could not resolve Velocity or EaglerXServer release URL. Set VELOCITY_URL/EAGLER_URL or tags to override." >&2
@@ -111,6 +113,7 @@ if [ -n "${RESOLVED_VAULT_URL:-}" ]; then echo " - Vault: $RESOLVED_VAULT_URL" >
 if [ -n "${RESOLVED_LUCK_URL:-}" ]; then echo " - LuckPerms: $RESOLVED_LUCK_URL" >&2; fi
 if [ -n "${RESOLVED_WE_URL:-}" ]; then echo " - WorldEdit: $RESOLVED_WE_URL" >&2; fi
 if [ -n "${RESOLVED_WG_URL:-}" ]; then echo " - WorldGuard: $RESOLVED_WG_URL" >&2; fi
+if [ -n "${RESOLVED_DISCORD_URL:-}" ]; then echo " - DiscordSRV: $RESOLVED_DISCORD_URL" >&2; fi
 
 # Download helper
 download_if_needed() {
@@ -146,6 +149,9 @@ if [ -n "${RESOLVED_WE_URL:-}" ]; then
 fi
 if [ -n "${RESOLVED_WG_URL:-}" ]; then
   download_if_needed "$RESOLVED_WG_URL" "$BACKEND_PLUGINS_DIR/WorldGuard.jar"
+fi
+if [ -n "${RESOLVED_DISCORD_URL:-}" ]; then
+  download_if_needed "$RESOLVED_DISCORD_URL" "$BACKEND_PLUGINS_DIR/DiscordSRV.jar"
 fi
 
 # Start docker-compose
