@@ -1,0 +1,8 @@
+{
+  "name": "Eagler Authentication",
+  "main": "com.ethanplayz.eaglerauth.EaglerAuth",
+  "version": "1.0.0",
+  "id": "eagler-auth",
+  "description": "Authenticates Eaglercraft browser connections against an external auth service.",
+  "authors": ["ethanplayz12345678987654"]
+}
