@@ -1,0 +1,12 @@
+# Example EaglerXServer plugin config (example; plugin name/config keys may differ)
+# Save this at ./deploy/proxy/plugins/eaglerx.yml
+
+# The listener/inject address must match one of the proxy listeners.
+# If Velocity binds to 0.0.0.0:25565, set inject_address to that bind (or the named listener "0.0.0.0:25565").
+inject_address: "0.0.0.0:25565"
+
+# The backend server to forward to (the name as defined in your proxy config)
+default_server: "backend"
+
+# Optional: logging/other plugin options
+log_level: INFO

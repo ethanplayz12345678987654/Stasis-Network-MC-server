@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    image: itzg/minecraft-server
+    container_name: mc_backend
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "1.21"
+      MEMORY: "2G"
+    volumes:
+      - ./backend/data:/data
+    networks:
+      - mcnet
+    # Do NOT map backend port to host; proxy will be the public entrypoint.
+
+  proxy:
+    image: openjdk:17-jdk
+    container_name: mc_proxy
+    working_dir: /srv
+    volumes:
+      - ./proxy:/srv
+    command: bash -lc "if [ -f ./server.jar ]; then java -Xms512M -Xmx1G -jar server.jar; else echo 'Please place Velocity/Bungee server jar at ./proxy/server.jar'; sleep infinity; fi"
+    ports:
+      - "25565:25565" # public port (Velocity/Bungee listen port - Eagler clients connect here)
+      - "25577:25577" # optional extra port (for admin web UI or separate WS)
+    networks:
+      - mcnet
+
+networks:
+  mcnet:
+    driver: bridge

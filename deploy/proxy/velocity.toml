@@ -1,0 +1,15 @@
+# Example Velocity configuration (minimal)
+# Save this at ./deploy/proxy/velocity.toml
+
+# Address Velocity will bind to (host:port)
+bind = "0.0.0.0:25565"
+
+# Define backend servers that Velocity can forward to
+[servers]
+# Key is the server name used by the proxy config and by plugin settings
+  backend = { address = "backend:25565" }
+
+# Default server players are sent to when they connect
+default_server = "backend"
+
+# Motd and other fields can be customized as needed.
