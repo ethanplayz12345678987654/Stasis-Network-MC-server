@@ -13,7 +13,12 @@ services:
       - ./backend/data:/data
     networks:
       - mcnet
-    # Do NOT map backend port to host; proxy will be the public entrypoint.
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   proxy:
     image: openjdk:17-jdk
@@ -27,6 +32,22 @@ services:
       - "25577:25577" # optional extra port (for admin web UI or separate WS)
     networks:
       - mcnet
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  # Optional: Watchtower for automatic container image updates. Uncomment to enable auto-updates.
+  # watchtower:
+  #   image: containrrr/watchtower:latest
+  #   container_name: watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   environment:
+  #     - WATCHTOWER_CLEANUP=true
+  #   restart: unless-stopped
 
 networks:
   mcnet:
