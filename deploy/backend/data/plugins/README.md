@@ -1,22 +1,13 @@
-# Backend plugins directory (managed by start.sh)
+Added WorldEdit and WorldGuard to the backend plugins README and notes.
 
-This directory is where backend plugins (Paper/PaperMC) should be placed so the mc_backend container can load them.
+This folder is where backend plugins are placed by deploy/start.sh. The script will attempt to download WorldEdit and WorldGuard jars (if release assets can be resolved) into this directory on invocation.
 
-The helper script deploy/start.sh will attempt to download EssentialsX, Vault, and LuckPerms into this directory automatically if their releases can be resolved from GitHub. If you prefer to manage plugins manually, place plugin jars here and restart the backend container.
+If downloads fail, provide direct URLs via WORLDEDIT_URL and WORLDGUARD_URL environment variables, or pin with WORLDEDIT_TAG and WORLDGUARD_TAG.
 
-Example:
-- deploy/backend/data/plugins/EssentialsX.jar
-- deploy/backend/data/plugins/Vault.jar
-- deploy/backend/data/plugins/LuckPerms.jar
+Example invocation:
 
-To force-download plugins via the helper script, run:
+  WORLDEDIT_TAG="v8.0.0" WORLDGUARD_TAG="v8.0.0" ./deploy/start.sh
 
-  ./deploy/start.sh
+Or supply direct URLs:
 
-You can also pin versions by setting environment variables before running start.sh:
-
-  VELOCITY_TAG="vX.Y.Z" EAGLER_TAG="vA.B.C" ESSENTIALS_TAG="v1.5.0" VAULT_TAG="v1.7.0" LUCKPERMS_TAG="vX.Y.Z" ./deploy/start.sh
-
-Or supply direct download URLs:
-
-  VELOCITY_URL="https://.../velocity.jar" EAGLER_URL="https://.../EaglerXServer.jar" ESSENTIALS_URL="https://.../EssentialsX.jar" VAULT_URL="https://.../Vault.jar" LUCKPERMS_URL="https://.../LuckPerms.jar" ./deploy/start.sh
+  WORLDEDIT_URL="https://.../worldedit.jar" WORLDGUARD_URL="https://.../worldguard.jar" ./deploy/start.sh

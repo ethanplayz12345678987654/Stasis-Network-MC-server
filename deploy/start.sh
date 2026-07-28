@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# Helper script to fetch Velocity, EaglerXServer, and optional EssentialsX, Vault, LuckPerms jars
-# (latest or tagged) and start the docker-compose stack.
+# Helper script to fetch Velocity, EaglerXServer, and optional backend plugins
+# (EssentialsX, Vault, LuckPerms, WorldEdit, WorldGuard) and start the docker-compose stack.
 # Behavior:
 # - By default, fetches the latest release for PaperMC/Velocity, lax1dude/eaglerxserver, EssentialsX/Essentials,
-#   MilkBowl/Vault, and lucko/LuckPerms via the GitHub releases API where available.
-# - You can pin to a tag by setting VELOCITY_TAG, EAGLER_TAG, ESSENTIALS_TAG, VAULT_TAG, and/or LUCKPERMS_TAG environment variables.
-# - You can bypass the API and provide direct URLs by setting VELOCITY_URL, EAGLER_URL, ESSENTIALS_URL, VAULT_URL, and/or LUCKPERMS_URL environment variables.
+#   MilkBowl/Vault, lucko/LuckPerms, EngineHub/WorldEdit, EngineHub/WorldGuard via the GitHub releases API where available.
+# - You can pin to a tag by setting VELOCITY_TAG, EAGLER_TAG, ESSENTIALS_TAG, VAULT_TAG, LUCKPERMS_TAG,
+#   WORLDEDIT_TAG, and/or WORLDGUARD_TAG environment variables.
+# - You can bypass the API and provide direct URLs by setting VELOCITY_URL, EAGLER_URL, ESSENTIALS_URL, VAULT_URL,
+#   LUCKPERMS_URL, WORLDEDIT_URL, and/or WORLDGUARD_URL environment variables.
 # - If GITHUB_TOKEN is set in the environment, it will be used to increase GitHub API rate limits.
 
 set -euo pipefail
@@ -24,6 +26,8 @@ EAGLER_REPO="lax1dude/eaglerxserver"
 ESSENTIALS_REPO="EssentialsX/Essentials"
 VAULT_REPO="MilkBowl/Vault"
 LUCK_REPO="lucko/LuckPerms"
+WE_REPO="EngineHub/WorldEdit"
+WG_REPO="EngineHub/WorldGuard"
 
 # Utility: call GitHub API, optionally using token
 github_api_get() {
@@ -91,6 +95,8 @@ RESOLVED_EAGLER_URL=$(resolve_release_asset "$EAGLER_REPO" "${EAGLER_TAG:-}" ".*
 RESOLVED_ESSENTIALS_URL=$(resolve_release_asset "$ESSENTIALS_REPO" "${ESSENTIALS_TAG:-}" ".*Essentials.*\\.jar$" ".*\\.jar$" ESSENTIALS_URL) || true
 RESOLVED_VAULT_URL=$(resolve_release_asset "$VAULT_REPO" "${VAULT_TAG:-}" ".*Vault.*\\.jar$" ".*\\.jar$" VAULT_URL) || true
 RESOLVED_LUCK_URL=$(resolve_release_asset "$LUCK_REPO" "${LUCKPERMS_TAG:-}" ".*luckperms.*\\.jar$" ".*\\.jar$" LUCKPERMS_URL) || true
+RESOLVED_WE_URL=$(resolve_release_asset "$WE_REPO" "${WORLDEDIT_TAG:-}" ".*worldedit.*\\.jar$" ".*\\.jar$" WORLDEDIT_URL) || true
+RESOLVED_WG_URL=$(resolve_release_asset "$WG_REPO" "${WORLDGUARD_TAG:-}" ".*worldguard.*\\.jar$" ".*\\.jar$" WORLDGUARD_URL) || true
 
 if [ -z "${RESOLVED_VELOCITY_URL:-}" ] || [ -z "${RESOLVED_EAGLER_URL:-}" ]; then
   echo "ERROR: Could not resolve Velocity or EaglerXServer release URL. Set VELOCITY_URL/EAGLER_URL or tags to override." >&2
@@ -103,8 +109,10 @@ echo " - EaglerXServer: $RESOLVED_EAGLER_URL" >&2
 if [ -n "${RESOLVED_ESSENTIALS_URL:-}" ]; then echo " - EssentialsX: $RESOLVED_ESSENTIALS_URL" >&2; fi
 if [ -n "${RESOLVED_VAULT_URL:-}" ]; then echo " - Vault: $RESOLVED_VAULT_URL" >&2; fi
 if [ -n "${RESOLVED_LUCK_URL:-}" ]; then echo " - LuckPerms: $RESOLVED_LUCK_URL" >&2; fi
+if [ -n "${RESOLVED_WE_URL:-}" ]; then echo " - WorldEdit: $RESOLVED_WE_URL" >&2; fi
+if [ -n "${RESOLVED_WG_URL:-}" ]; then echo " - WorldGuard: $RESOLVED_WG_URL" >&2; fi
 
-# Download function with size check
+# Download helper
 download_if_needed() {
   local url="$1"; local dest="$2"
   if [ -f "$dest" ]; then
@@ -132,6 +140,12 @@ if [ -n "${RESOLVED_VAULT_URL:-}" ]; then
 fi
 if [ -n "${RESOLVED_LUCK_URL:-}" ]; then
   download_if_needed "$RESOLVED_LUCK_URL" "$BACKEND_PLUGINS_DIR/LuckPerms.jar"
+fi
+if [ -n "${RESOLVED_WE_URL:-}" ]; then
+  download_if_needed "$RESOLVED_WE_URL" "$BACKEND_PLUGINS_DIR/WorldEdit.jar"
+fi
+if [ -n "${RESOLVED_WG_URL:-}" ]; then
+  download_if_needed "$RESOLVED_WG_URL" "$BACKEND_PLUGINS_DIR/WorldGuard.jar"
 fi
 
 # Start docker-compose
